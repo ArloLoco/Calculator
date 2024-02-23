@@ -1,0 +1,49 @@
+<resources>
+    <string name="app_name">Calculator</string>
+
+    <!-- Number buttons -->
+    <string name="one">1</string>
+    <string name="cd_one">one</string>
+    <string name="two">2</string>
+    <string name="cd_two">two</string>
+    <string name="three">3</string>
+    <string name="cd_three">three</string>
+    <string name="four">4</string>
+    <string name="cd_four">four</string>
+    <string name="five">5</string>
+    <string name="cd_five">five</string>
+    <string name="six">6</string>
+    <string name="cd_six">six</string>
+    <string name="seven">7</string>
+    <string name="cd_seven">seven</string>
+    <string name="eight">8</string>
+    <string name="cd_eight">eight</string>
+    <string name="nine">9</string>
+    <string name="cd_nine">nine</string>
+    <string name="zero">0</string>
+    <string name="cd_zero">zero</string>
+
+    <!-- Operations and special buttons -->
+    <string name="add">+</string>
+    <string name="cd_add">add</string>
+    <string name="minus">\u2212</string>
+    <string name="cd_minus">subtract</string>
+    <string name="divide">\u00F7</string>
+    <string name="cd_divide">divide</string>
+    <string name="multiply">\u00D7</string>
+    <string name="cd_multiply">multiply</string>
+    <string name="equals">=</string>
+    <string name="cd_equals">equals</string>
+    <string name="all_clear">AC</string>
+    <string name="cd_all_clear">all clear</string>
+    <string name="cd_backspace">backspace</string>
+    <string name="decimal_point">.</string>
+    <string name="cd_decimal_point">decimal point</string>
+    <string name="percent">%</string>
+    <string name="cd_percent">percent</string>
+    <string name="parenthesis">( )</string>
+    <string name="cd_parenthesis">open and close parenthesis</string>
+
+    <!-- Misc strings -->
+    <string name="settings">settings</string>
+</resources>
