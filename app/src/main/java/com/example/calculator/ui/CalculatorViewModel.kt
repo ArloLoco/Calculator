@@ -58,6 +58,7 @@ class CalculatorViewModel : ViewModel() {
                 last.toDoubleOrNull() != null -> {
                     userInput += symbol
                     calcInput += operator
+                    calcComplete = false
                 }
                 else -> { }
             }
@@ -115,6 +116,7 @@ class CalculatorViewModel : ViewModel() {
 
         val openOrClose = if (total <= 0 || userInput.endsWith('(')) '(' else ')'
 
+        calcComplete = false
         userInput += openOrClose
         calcInput += openOrClose
         updateCalculation()
@@ -129,14 +131,16 @@ class CalculatorViewModel : ViewModel() {
 
     //
     private fun calculate() {
-        userInput = _uiState.value.result
-        calcInput = _uiState.value.result
-        calcComplete = true
-        updateCalculation()
+        if (_uiState.value.result.isNotEmpty()) {
+            userInput = _uiState.value.result
+            calcInput = _uiState.value.result
+            calcComplete = true
+            updateCalculation()
 
-        _uiState.value = _uiState.value.copy(
-            result = ""
-        )
+            _uiState.value = _uiState.value.copy(
+                result = ""
+            )
+        }
     }
 
     // DONE

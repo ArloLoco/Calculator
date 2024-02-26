@@ -2,8 +2,28 @@ package com.example.calculator.ui
 
 object ExpressionEvaluator {
 
-    private fun implicitMultiplication() {
+    private fun insertMultiply(expression: String, index: Int): String {
+        return expression.substring(0, index) + " * " + expression.substring(index)
+    }
 
+    private fun implicitMultiplication(expression: String):String {
+
+        var processedExpression: String = expression
+        val indexes = mutableListOf<Int>()
+
+        for ((index, char) in expression.withIndex()) {
+            if (index > 0 && char == '(' && expression[index - 1].isDigit()) {
+                indexes += index - 1
+            } else if ( char == ')' && index < expression.length && expression[index + 1].isDigit()) {
+                indexes += index + 1
+            }
+        }
+
+        for (position in indexes.sortedDescending()) {
+            processedExpression = insertMultiply(processedExpression, position)
+        }
+
+        return processedExpression
     }
 
     private fun shuntingYard(expression: String): List<String> {
@@ -97,9 +117,9 @@ object ExpressionEvaluator {
         }
     }
 
-    // TODO lose decimal place and change to string
     fun evaluateExpression(expression: String): String {
-        val postfix = shuntingYard(expression)
+        val preProcessed = implicitMultiplication(expression)
+        val postfix = shuntingYard(preProcessed)
         val evaluated = evaluatePostfix(postfix)
 
         return formatDoubleToString(evaluated)
