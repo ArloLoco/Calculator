@@ -41,12 +41,11 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.calculator.R
 import com.example.calculator.data.ButtonContent
 import com.example.calculator.data.ButtonData
+import com.example.calculator.data.buttonActionsMap
 import com.example.calculator.ui.theme.CalculatorTheme
 
 @Composable
-fun CalculatorApp(
-    modifier : Modifier = Modifier
-) {
+fun CalculatorApp() {
     CalculatorButtonsLayout()
 }
 
@@ -67,7 +66,6 @@ fun CalculatorButtonsLayout(
     val totalPadding = paddingBetweenButtons * (4 - 1)
     val buttonSize = (maxWidth - totalPadding) / 4
 
-    val userInput = calcViewModel.userInput
     val calcUiState by calcViewModel.uiState.collectAsState()
 
     Column (
@@ -98,7 +96,7 @@ fun CalculatorButtonsLayout(
                 }
             }
             Text(
-                text = userInput,
+                text = calcUiState.userInput,
                 textAlign = TextAlign.Right,
                 fontSize = 64.sp,
                 maxLines = 1,
@@ -144,33 +142,8 @@ fun CalculatorButtonsLayout(
                 ) {
                     row.forEach { buttonContent ->
                         val action = when (buttonContent) {
-                            is ButtonContent.Text -> when (buttonContent.resourceId) {
-                                R.string.zero -> CalculatorAction.Number("0")
-                                R.string.one -> CalculatorAction.Number("1")
-                                R.string.two -> CalculatorAction.Number("2")
-                                R.string.three -> CalculatorAction.Number("3")
-                                R.string.four -> CalculatorAction.Number("4")
-                                R.string.five -> CalculatorAction.Number("5")
-                                R.string.six -> CalculatorAction.Number("6")
-                                R.string.seven -> CalculatorAction.Number("7")
-                                R.string.eight -> CalculatorAction.Number("8")
-                                R.string.nine -> CalculatorAction.Number("9")
-                                R.string.add -> CalculatorAction.Operation(CalculatorOperation.Add)
-                                R.string.minus -> CalculatorAction.Operation(CalculatorOperation.Minus)
-                                R.string.multiply -> CalculatorAction.Operation(CalculatorOperation.Multiply)
-                                R.string.divide -> CalculatorAction.Operation(CalculatorOperation.Divide)
-                                R.string.all_clear -> CalculatorAction.AllClear
-                                R.string.parenthesis -> CalculatorAction.Parentheses
-                                R.string.percent -> CalculatorAction.Percent
-                                R.string.decimal_point -> CalculatorAction.Decimal
-                                R.string.equals -> CalculatorAction.Calculate
-                                else -> null
-                            }
-
-                            is ButtonContent.Drawable -> when (buttonContent.contentDescription) {
-                                R.string.cd_backspace -> CalculatorAction.Delete
-                                else -> null
-                            }
+                            is ButtonContent.Text -> buttonActionsMap[buttonContent.resourceId]
+                            is ButtonContent.Drawable -> buttonActionsMap[buttonContent.contentDescription]
                             }
                         CalculatorButton(
                             content = buttonContent,

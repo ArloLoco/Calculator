@@ -1,8 +1,5 @@
 package com.example.calculator.ui
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -12,10 +9,6 @@ class CalculatorViewModel : ViewModel() {
 
     private val _uiState = MutableStateFlow(CalculatorUiState())
     val uiState: StateFlow<CalculatorUiState> = _uiState.asStateFlow()
-
-    var userInput by mutableStateOf("")
-    var calcInput by mutableStateOf("")
-    var calcComplete by mutableStateOf(false)
 
     fun onAction(action: CalculatorAction) {
         when (action) {
@@ -32,123 +25,127 @@ class CalculatorViewModel : ViewModel() {
 
     // DONE
     private fun enterNumber(number: String) {
-        if (calcComplete) {
+        if (_uiState.value.isCalculationComplete) {
             allClear()
         }
-        userInput += number
-        calcInput += number
-        updateCalculation()
+        _uiState.value.userInput + number
+        _uiState.value.calculation + number
+        resultReady()
     }
 
     // DONE
     private fun enterOperation(symbol: String, operator: String) {
-        if (userInput.isNotEmpty()) {
-            val last = calcInput.takeLast(2)
+        if (_uiState.value.userInput.isNotEmpty()) {
+            val last = _uiState.value.calculation.takeLast(2)
 
             when {
                 last == "+ " || last == "* " || last == "/ " || last == "- " -> {
                     delete()
-                    userInput += symbol
-                    calcInput += operator
+                    _uiState.value.userInput + symbol
+                    _uiState.value.calculation + operator
                 }
                 last == "(" || last == ")" -> if (symbol == "-") {
-                    userInput += symbol
-                    calcInput += symbol
+                    _uiState.value.userInput + symbol
+                    _uiState.value.calculation + symbol
                 }
                 last.toDoubleOrNull() != null -> {
-                    userInput += symbol
-                    calcInput += operator
-                    calcComplete = false
+                    _uiState.value.userInput + symbol
+                    _uiState.value.calculation + operator
+                    _uiState.value = _uiState.value.copy(
+                        isCalculationComplete = false
+                    )
                 }
                 else -> { }
             }
         } else if (symbol == "-") {
-            userInput += symbol
-            calcInput += symbol
+            _uiState.value.userInput + symbol
+            _uiState.value.calculation + symbol
         }
-        updateCalculation()
+        resultReady()
     }
 
     // DONE
     private fun delete() {
-        if (userInput.isNotEmpty()) {
-            userInput = userInput.dropLast(1)
-            if (!calcInput.endsWith(' ')) {
-                calcInput.dropLast(1)
+        if (_uiState.value.userInput.isNotEmpty()) {
+            _uiState.value = _uiState.value.copy(
+                userInput = _uiState.value.userInput.dropLast(1)
+            )
+
+
+            if (!_uiState.value.calculation.endsWith(' ')) {
+                _uiState.value.calculation.dropLast(1)
             } else {
-                calcInput.dropLast(3)
+                _uiState.value.calculation.dropLast(3)
             }
-            updateCalculation()
+            resultReady()
         }
     }
 
     // DONE
     private fun allClear() {
-        calcComplete = false
-        userInput = ""
-        calcInput = ""
         _uiState.value = _uiState.value.copy(
+            userInput = "",
             calculation = "",
-            result = ""
+            result = "",
+            isCalculationComplete = false
         )
     }
 
     // DONE
     private fun enterDecimal() {
-        if (calcComplete) {
+        if (_uiState.value.isCalculationComplete) {
             allClear()
         }
-        if (userInput.isEmpty() || calcInput.last() == ' ') {
-            userInput += "0."
-            calcInput += "0."
+        if (_uiState.value.userInput.isEmpty() || _uiState.value.calculation.last() == ' ') {
+            _uiState.value = _uiState.value.copy(
+                userInput = "0.",
+                calculation = "0."
+            )
         } else {
-            userInput += "."
-            calcInput += "."
+            _uiState.value.userInput + "."
+            _uiState.value.calculation + "."
         }
-        updateCalculation()
+        resultReady()
     }
 
     // DONE
     private fun enterParentheses() {
-        val countOpen = userInput.count { it == '(' }
-        val countClose = userInput.count { it == ')' }
+        val countOpen = _uiState.value.userInput.count { it == '(' }
+        val countClose = _uiState.value.userInput.count { it == ')' }
         val total = countOpen - countClose
 
-        val openOrClose = if (total <= 0 || userInput.endsWith('(')) '(' else ')'
+        val openOrClose = if (total <= 0 || _uiState.value.userInput.endsWith('(')) '(' else ')'
 
-        calcComplete = false
-        userInput += openOrClose
-        calcInput += openOrClose
-        updateCalculation()
+        _uiState.value = _uiState.value.copy(
+            isCalculationComplete = false
+        )
+
+        _uiState.value.userInput + openOrClose
+        _uiState.value.calculation + openOrClose
+        resultReady()
     }
 
     // DONE
     private fun percent() {
-        userInput += "%"
-        calcInput += " / 100"
-        updateCalculation()
+        _uiState.value.userInput + "%"
+        _uiState.value.calculation + " / 100"
+        resultReady()
     }
 
     //
     private fun calculate() {
         if (_uiState.value.result.isNotEmpty()) {
-            userInput = _uiState.value.result
-            calcInput = _uiState.value.result
-            calcComplete = true
-            updateCalculation()
+            _uiState.value = _uiState.value.copy(
+                userInput = _uiState.value.result,
+                calculation = _uiState.value.result,
+                isCalculationComplete = true
+            )
+            resultReady()
 
             _uiState.value = _uiState.value.copy(
                 result = ""
             )
         }
-    }
-
-    // DONE
-    private fun updateCalculation() {
-        _uiState.value = _uiState.value.copy(
-            calculation = calcInput
-        )
-        resultReady()
     }
 
     //
