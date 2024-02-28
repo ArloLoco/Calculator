@@ -28,8 +28,12 @@ class CalculatorViewModel : ViewModel() {
         if (_uiState.value.isCalculationComplete) {
             allClear()
         }
-        _uiState.value.userInput + number
-        _uiState.value.calculation + number
+
+        updateState(
+        userInput = _uiState.value.userInput + number,
+        calculation = _uiState.value.calculation + number
+        )
+
         resultReady()
     }
 
@@ -41,25 +45,31 @@ class CalculatorViewModel : ViewModel() {
             when {
                 last == "+ " || last == "* " || last == "/ " || last == "- " -> {
                     delete()
-                    _uiState.value.userInput + symbol
-                    _uiState.value.calculation + operator
+                    updateState(
+                        userInput = _uiState.value.userInput + symbol,
+                        calculation = _uiState.value.calculation + operator
+                    )
                 }
                 last == "(" || last == ")" -> if (symbol == "-") {
-                    _uiState.value.userInput + symbol
-                    _uiState.value.calculation + symbol
+                    updateState(
+                        userInput = _uiState.value.userInput + symbol,
+                        calculation = _uiState.value.calculation + symbol
+                    )
                 }
                 last.toDoubleOrNull() != null -> {
-                    _uiState.value.userInput + symbol
-                    _uiState.value.calculation + operator
-                    _uiState.value = _uiState.value.copy(
+                    updateState(
+                        userInput = _uiState.value.userInput + symbol,
+                        calculation = _uiState.value.calculation + operator,
                         isCalculationComplete = false
                     )
                 }
                 else -> { }
             }
         } else if (symbol == "-") {
-            _uiState.value.userInput + symbol
-            _uiState.value.calculation + symbol
+            updateState(
+                userInput = _uiState.value.userInput + symbol,
+                calculation = _uiState.value.calculation + symbol
+            )
         }
         resultReady()
     }
@@ -67,15 +77,19 @@ class CalculatorViewModel : ViewModel() {
     // DONE
     private fun delete() {
         if (_uiState.value.userInput.isNotEmpty()) {
-            _uiState.value = _uiState.value.copy(
+            updateState(
                 userInput = _uiState.value.userInput.dropLast(1)
             )
 
 
             if (!_uiState.value.calculation.endsWith(' ')) {
-                _uiState.value.calculation.dropLast(1)
+                updateState(
+                calculation = _uiState.value.calculation.dropLast(1)
+                )
             } else {
-                _uiState.value.calculation.dropLast(3)
+                updateState(
+                    calculation = _uiState.value.calculation.dropLast(3)
+                )
             }
             resultReady()
         }
@@ -83,7 +97,7 @@ class CalculatorViewModel : ViewModel() {
 
     // DONE
     private fun allClear() {
-        _uiState.value = _uiState.value.copy(
+        updateState(
             userInput = "",
             calculation = "",
             result = "",
@@ -97,13 +111,15 @@ class CalculatorViewModel : ViewModel() {
             allClear()
         }
         if (_uiState.value.userInput.isEmpty() || _uiState.value.calculation.last() == ' ') {
-            _uiState.value = _uiState.value.copy(
+            updateState(
                 userInput = "0.",
                 calculation = "0."
             )
         } else {
-            _uiState.value.userInput + "."
-            _uiState.value.calculation + "."
+            updateState(
+                userInput = _uiState.value.userInput + ".",
+                calculation = _uiState.value.calculation + "."
+            )
         }
         resultReady()
     }
@@ -116,33 +132,36 @@ class CalculatorViewModel : ViewModel() {
 
         val openOrClose = if (total <= 0 || _uiState.value.userInput.endsWith('(')) '(' else ')'
 
-        _uiState.value = _uiState.value.copy(
+        updateState(
             isCalculationComplete = false
         )
-
-        _uiState.value.userInput + openOrClose
-        _uiState.value.calculation + openOrClose
+        updateState(
+            userInput = _uiState.value.userInput + openOrClose,
+            calculation = _uiState.value.calculation + openOrClose
+        )
         resultReady()
     }
 
     // DONE
     private fun percent() {
-        _uiState.value.userInput + "%"
-        _uiState.value.calculation + " / 100"
+        updateState(
+            userInput = _uiState.value.userInput + "%",
+            calculation = _uiState.value.calculation + " / 100"
+        )
         resultReady()
     }
 
     //
     private fun calculate() {
         if (_uiState.value.result.isNotEmpty()) {
-            _uiState.value = _uiState.value.copy(
+            updateState(
                 userInput = _uiState.value.result,
                 calculation = _uiState.value.result,
                 isCalculationComplete = true
             )
             resultReady()
 
-            _uiState.value = _uiState.value.copy(
+            updateState(
                 result = ""
             )
         }
@@ -155,9 +174,23 @@ class CalculatorViewModel : ViewModel() {
         if ((currentCalculation.contains(' ') || currentCalculation.contains('('))
                     &&
                     (currentCalculation.last().toString().toDoubleOrNull() != null || currentCalculation.last() == '.')) {
-            _uiState.value = _uiState.value.copy(
+            updateState(
                 result = ExpressionEvaluator.evaluateExpression(currentCalculation)
             )
         }
+    }
+
+    private fun updateState(
+        userInput: String? = null,
+        calculation: String? = null,
+        result: String? = null,
+        isCalculationComplete: Boolean? = null
+    ) {
+        _uiState.value = _uiState.value.copy(
+            userInput = userInput ?: _uiState.value.userInput,
+            calculation = calculation ?: _uiState.value.calculation,
+            result = result ?: _uiState.value.result,
+            isCalculationComplete = isCalculationComplete ?: _uiState.value.isCalculationComplete
+        )
     }
 }
