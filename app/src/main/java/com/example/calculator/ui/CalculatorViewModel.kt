@@ -40,17 +40,26 @@ class CalculatorViewModel : ViewModel() {
     // DONE
     private fun enterOperation(symbol: String, operator: String) {
         if (_uiState.value.userInput.isNotEmpty()) {
-            val last = _uiState.value.calculation.takeLast(2)
+            val last = _uiState.value.userInput.takeLast(1)
 
             when {
-                last == "+ " || last == "* " || last == "/ " || last == "- " -> {
-                    delete()
-                    updateState(
-                        userInput = _uiState.value.userInput + symbol,
-                        calculation = _uiState.value.calculation + operator
-                    )
+                last == "+" || last == "×" || last == "÷" || last == "-" -> {
+                    if (_uiState.value.userInput.length == 1 && last == "-") {
+
+                    } else {
+                        delete()
+                        updateState(
+                            userInput = _uiState.value.userInput + symbol,
+                            calculation = _uiState.value.calculation + operator
+                        )
+                    }
                 }
                 last == "(" || last == ")" -> if (symbol == "-") {
+                    updateState(
+                        userInput = _uiState.value.userInput + symbol,
+                        calculation = _uiState.value.calculation + symbol
+                    )
+                } else if (last == ")") {
                     updateState(
                         userInput = _uiState.value.userInput + symbol,
                         calculation = _uiState.value.calculation + symbol
