@@ -91,7 +91,9 @@ class CalculatorViewModel : ViewModel() {
                     calculation = _uiState.value.calculation.dropLast(3)
                 )
             }
-
+            updateState(
+                result = ""
+            )
             resultReady()
         }
     }
@@ -170,9 +172,6 @@ class CalculatorViewModel : ViewModel() {
 
     //
     private fun resultReady() {
-        updateState(
-            result = ""
-        )
         val currentCalculation = _uiState.value.calculation
 
         if ((currentCalculation.contains(' ') || currentCalculation.contains('('))
